@@ -14,6 +14,7 @@ extern int yylex_destroy();
 extern char *yytext;
 extern int yylineno;
 extern int pos;
+extern int parser;
 
 FILE *out_err;
 
@@ -29,6 +30,8 @@ int main(int argc, char *argv[])
 	int literal_cap = 0, unknown_literal_cap = 0;
 	int literal_length = 0, unknown_literal_length = 0;
 	char *literal = NULL, *unknown_literal = NULL;
+
+	parser = 0;
 
 	// Read options from command line
 	while ((opt = getopt(argc, argv, "ho:")) != -1) {

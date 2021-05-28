@@ -15,6 +15,7 @@
 	extern int yylineno;
 	extern int yyleng;
 	extern int pos;
+	extern char *id;
 	int undefined_variable = 0;
 	char err_msg[256];
 
@@ -63,7 +64,7 @@ start		:	line				{root = $1;}
        		;
 
 line		:	stmt				{$$ = $1;}
-			|	line NEWLINE stmt	{$$ = $1;push_back($1, $3);}
+			|	line NEWLINE stmt	{$$ = $1; if ($$ != NULL) {push_back($1, $3);}}
 			;
 
 stmt		:	%empty				{$$ = NULL;}
@@ -71,7 +72,7 @@ stmt		:	%empty				{$$ = NULL;}
       		|	expr				{$$ = $1;}
 		;
 
-assignment	:	IDENTIFIER ASSIGNMENT expr	{$$ = create_id($1, $3);}
+assignment	:	IDENTIFIER ASSIGNMENT expr	{$$ = create_id($1, $3); free($1); id = NULL;}
 	   	;
 
 expr		:	expr GT term			{$$ = create_op(GT, 2, $1, $3);}
@@ -105,12 +106,13 @@ unary		:	primary				{$$ = $1;}
 
 primary		:	IDENTIFIER			{
 										Node *value = symboltable_get(symbols, $1);
+										$$ = create_id($1, value);
 										if (value == NULL) {
 											undefined_variable = 1;
 											sprintf(err_msg, "undefined variable %s", $1);
-											YYABORT;
 										}
-										$$ = create_id($1, (Node *)value);
+										free($1);
+										id = NULL;
 										pos=pos+yyleng;
 									}
 	 	|	INTEGER				{$$ = create_const_int($1);pos=pos+yyleng;}

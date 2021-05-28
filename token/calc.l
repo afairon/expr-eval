@@ -1,6 +1,5 @@
 /* Include header for token types */
 %{
-	#include <stdio.h>
 	#include <stdlib.h>
 	#include <string.h>
 
@@ -10,8 +9,9 @@
 	extern int yylineno;	// line number
 	extern int yyleng;	// length of token
 	int pos = 1;		// token position
+	int parser = 1; // use parser
 
-	char id[128]; // identifier
+	char *id = NULL;
 %}
 
 number		(0|[1-9][0-9]*)
@@ -23,7 +23,16 @@ identifier	[A-Za-z][_0-9A-Za-z]*
 
 {number}			{yylval.ival = atol(yytext);return INTEGER;}
 ({decimal}|{scientific})	{yylval.fval = atof(yytext);return REALNUM;}
-{identifier}			{strncpy(id, yytext, 127);yylval.id = id;return IDENTIFIER;}
+{identifier}			{
+							if (parser) {
+								id = (char *)malloc((strlen(yytext) + 1) * sizeof(char));
+								yylval.id = id;
+								if (id != NULL) {
+									strcpy(yylval.id, yytext);
+								}
+							}
+							return IDENTIFIER;
+						}
 \+				{++pos;return ADDITION;}
 \-				{++pos;return SUBTRACTION;}
 \*				{++pos;return MULTIPLICATION;}

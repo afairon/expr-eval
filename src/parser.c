@@ -13,6 +13,7 @@ extern int yyparse();
 extern int yylex_destroy();
 extern int yylineno;
 extern int pos;
+extern char *id;
 extern int undefined_variable;
 extern char err_msg[];
 
@@ -126,13 +127,18 @@ int main(int argc, char *argv[])
 		}
 		yy_scan_string(line);
 		err = yyparse();
-		if (undefined_variable) {
+		if (!err && undefined_variable) {
 			yyerror(err_msg);
 		}
 		if (!err && !undefined_variable) {
 			expr(root);
 		}
 		free_node(&root);
+		// Delete remaining identifier before parsing failed
+		if (id != NULL) {
+			free(id);
+			id = NULL;
+		}
 		yylex_destroy();
 		remove_space(line);
 		num_chars = strlen(line);

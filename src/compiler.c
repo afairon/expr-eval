@@ -14,6 +14,7 @@
 extern int yyparse();
 extern int yylex_destroy();
 extern int yylineno;
+extern char *id;
 extern int undefined_variable;
 
 extern hashtable_t *symbols;
@@ -97,13 +98,17 @@ int main(int argc, char *argv[])
 	while ((nread = getline(&line, &len, in)) != -1) {
 		yy_scan_string(line);
 		err = yyparse();
-		if (undefined_variable) {
+		if (!err && undefined_variable) {
 			yyerror(NULL);
 		}
 		if (!err && !undefined_variable) {
 			expr(root);
 		}
 		free_node(&root);
+		// Delete remaining identifier before parsing failed
+		if (id != NULL) {
+			free(id);
+		}
 		yylex_destroy();
 		fprintf(out, "\n");
 		undefined_variable = 0;
