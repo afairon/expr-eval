@@ -109,7 +109,7 @@ primary		:	IDENTIFIER			{
 										$$ = create_id($1, value);
 										if (value == NULL) {
 											undefined_variable = 1;
-											sprintf(err_msg, "undefined variable %s", $1);
+											sprintf(err_msg, "undefined variable %s at line %d, pos %d\n", $1, yylineno, pos);
 										}
 										free($1);
 										id = NULL;

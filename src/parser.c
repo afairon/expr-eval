@@ -48,8 +48,12 @@ void expr(Node *n)
 
 void yyerror(const char *s)
 {
-	fprintf(out_err, "%s at line %d, pos %d\n", s, yylineno, pos);
-	++yylineno;
+	if (undefined_variable) {
+		fprintf(out_err, err_msg);
+	} else {
+		fprintf(out_err, "%s at line %d, pos %d\n", s, yylineno, pos);
+		++yylineno;
+	}
 	pos = 1;
 }
 
