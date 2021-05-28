@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#define DEFAULT_HASHTABLE_SIZE 5
+#define DEFAULT_HASHTABLE_SIZE 10000
 
 typedef void (*free_func)(void *ptr);
 
